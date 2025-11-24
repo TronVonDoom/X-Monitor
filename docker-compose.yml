@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  x-monitor:
+    build: .
+    container_name: x-monitor
+    restart: unless-stopped
+    env_file:
+      - config.env
+    volumes:
+      - ./data:/app/data
+    environment:
+      - TZ=America/New_York
