@@ -156,6 +156,33 @@ def send_pushbullet_notification(pb, tweet, username):
         return False
 
 
+def send_startup_test(pb, twitter_client, user_id, username):
+    """Send a test notification on startup with the latest tweet"""
+    try:
+        logger.info("Sending startup test notification...")
+        
+        # Get the latest tweet
+        tweets = check_new_tweets(twitter_client, user_id)
+        
+        if tweets:
+            latest_tweet = tweets[0]
+            tweet_url = f"https://twitter.com/{username}/status/{latest_tweet.id}"
+            title = f"✅ X Monitor Started - Watching @{username}"
+            message = f"Monitor is now active!\n\nLatest post:\n{latest_tweet.text[:200]}...\n\n🔗 {tweet_url}"
+            
+            pb.push_note(title, message)
+            logger.info("✅ Startup test notification sent successfully!")
+        else:
+            # No tweets found, just send a simple notification
+            title = f"✅ X Monitor Started - Watching @{username}"
+            message = f"Monitor is now active and watching for new posts from @{username}"
+            pb.push_note(title, message)
+            logger.info("✅ Startup test notification sent (no recent tweets found)")
+            
+    except Exception as e:
+        logger.warning(f"Could not send startup test notification: {e}")
+
+
 def monitor_loop():
     """Main monitoring loop"""
     logger.info("=" * 50)
@@ -173,6 +200,9 @@ def monitor_loop():
     if not user_id:
         logger.error("Cannot continue without user ID")
         return
+    
+    # Send startup test notification
+    send_startup_test(pushbullet_client, twitter_client, user_id, TWITTER_USERNAME)
     
     # Load last tweet ID
     last_tweet_id = load_last_tweet_id()
