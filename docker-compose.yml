@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  x-monitor:
+    build: .
+    container_name: x-monitor
+    restart: unless-stopped
+    environment:
+      - TWITTER_API_KEY=${TWITTER_API_KEY}
+      - TWITTER_API_SECRET=${TWITTER_API_SECRET}
+      - TWITTER_BEARER_TOKEN=${TWITTER_BEARER_TOKEN}
+      - PUSHBULLET_API_KEY=${PUSHBULLET_API_KEY}
+      - TWITTER_USERNAME=${TWITTER_USERNAME:-PokemonDealsTCG}
+      - CHECK_INTERVAL=${CHECK_INTERVAL:-60}
+    volumes:
+      - ./data:/app/data
+      - ./monitor.log:/app/monitor.log
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
