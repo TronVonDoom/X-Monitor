@@ -12,19 +12,26 @@ from dotenv import load_dotenv
 import logging
 from datetime import datetime
 
-# Set up logging
+# Load environment variables early so LOG_FILE or CHECK_INTERVAL can be honored
+load_dotenv()
+
+# Logging: write to a persisted file inside /app/data to avoid host path conflicts
+LOG_FILE = os.getenv('LOG_FILE', '/app/data/monitor.log')
+try:
+    os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+except Exception:
+    # Best-effort; if this fails the FileHandler may still create the file in container FS
+    pass
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('monitor.log'),
+        logging.FileHandler(LOG_FILE),
         logging.StreamHandler()
     ]
 )
 logger = logging.getLogger(__name__)
-
-# Load environment variables
-load_dotenv()
 
 # Configuration from environment variables
 TWITTER_API_KEY = os.getenv('TWITTER_API_KEY')

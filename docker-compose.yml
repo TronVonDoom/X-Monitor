@@ -7,7 +7,6 @@ services:
       - .env
     volumes:
       - ./data:/app/data
-      - ./monitor.log:/app/monitor.log
     logging:
       driver: "json-file"
       options:
